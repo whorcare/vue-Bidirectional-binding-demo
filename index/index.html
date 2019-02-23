@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+</head>
+<body>
+    test2
+</body>
+<script>
+    /**
+     * Observer是一个数据监听器，其实现核心方法就是前文所说的Object.defineProperty( )。
+     * 如果要对所有属性都进行监听的话，那么可以通过递归方法遍历所有属性值，
+     * 并对其进行Object.defineProperty( )处理。如下代码，实现了一个Observer。
+     */
+    function defineReactive(data, key, val) {
+        observe(val); // 递归遍历所有子属性
+        Object.defineProperty(data, key, { // 核心方法 为get set
+            enumerable: true,
+            configurable: true,
+            get: function() {
+                return val;
+            },
+            set: function(newVal) {
+                val = newVal;
+                console.log('属性' + key + '已经被监听了，现在值为：“' + newVal.toString() + '”');
+            }
+        });
+    }
+
+    function observe(data) {
+        if (!data || typeof data !== 'object') {
+            return;
+        }
+        // Object.keys() 方法会返回一个由一个给定对象的自身可枚举属性组成的数组，数组中属性名的排列顺序和使用 for...in 循环遍历该对象时返回的顺序一致 。
+        Object.keys(data).forEach(function(key) {
+            defineReactive(data, key, data[key]);
+        });
+    };
+
+    var library = {
+        book1: {
+            name: ''
+        },
+        book2: ''
+    };
+    observe(library);
+    library.book1.name = 'vue权威指南'; // 属性name已经被监听了，现在值为：“vue权威指南”
+    library.book2 = '没有此书籍';  // 属性book2已经被监听了，现在值为：“没有此书籍”
+</script>
+</html>
