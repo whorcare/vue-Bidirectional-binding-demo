@@ -2,24 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>test2</title>
+    <title>self-vue</title>
 </head>
+<style>
+    #app {
+        text-align: center;
+    }
+</style>
 <body>
-    <h1 id="name">{{name}}</h1>
+<div id="app">
+    <h2>{{title}}</h2>
+    <input v-model="name">
+    <h1>{{name}}</h1>
+    <button v-on:click="clickMe">click me!</button>
+</div>
 </body>
 <script src="./observer.js"></script>
 <script src="./watcher.js"></script>
+<script src="./compile.js"></script>
 <script src="./index.js"></script>
 <script type="text/javascript">
-    var ele = document.querySelector('#name');
-    var selfVue = new SelfVue({
-        name: 'hello world'
-    }, ele, 'name');
-
-    window.setTimeout(function () {
-        console.log('name值改变了');
-        selfVue.name = 'canfoo';
-    }, 2000);
-
+    new SelfVue({
+        el: '#app',
+        data: {
+            title: 'hello world',
+            name: 'canfoo'
+        },
+        methods: {
+            clickMe: function () {
+                this.title = 'hello world';
+            }
+        },
+        mounted: function () {
+            window.setTimeout(() => {
+                this.title = '你好';
+        }, 1000);
+        }
+    });
 </script>
 </html>

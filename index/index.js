@@ -1,38 +1,27 @@
-// 这时候我们需要将Observer和Watcher关联起来：
-
-/**
- *  data -> name: 'hello world'
- *  el -> DOM
- *  exp -> name(key)
- **/
-function SelfVue (data, el, exp) {
+function SelfVue (options) {
     var self = this;
-    this.data = data;
+    this.data = options.data;
+    this.methods = options.methods;
 
-    Object.keys(data).forEach(function(key) {
-        self.proxyKeys(key);  // 绑定代理属性
+    Object.keys(this.data).forEach(function(key) {
+        self.proxyKeys(key);
     });
 
-    observe(data);
-    el.innerHTML = this.data[exp];  // 初始化模板数据的值
-    new Watcher(this, exp, function (value) {
-        el.innerHTML = value;
-    });
-    return this;
+    observe(this.data);
+    new Compile(options.el, this);
+    options.mounted.call(this); // 所有事情处理好后执行mounted函数
 }
 
-//我们给new SelfVue的时候做一个代理处理，让访问selfVue的属性代理为访问selfVue.data的属性，
-// 实现原理还是使用Object.defineProperty( )对属性值再包一层
 SelfVue.prototype = {
     proxyKeys: function (key) {
         var self = this;
         Object.defineProperty(this, key, {
             enumerable: false,
             configurable: true,
-            get: function proxyGetter() {
+            get: function getter () {
                 return self.data[key];
             },
-            set: function proxySetter(newVal) {
+            set: function setter (newVal) {
                 self.data[key] = newVal;
             }
         });
